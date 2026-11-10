@@ -1,0 +1,65 @@
+---
+import Base from '../../layouts/Base.astro';
+import QrGenerator from '../../components/QrGenerator.astro';
+import Crumbs from '../../components/Crumbs.astro';
+import Faq from '../../components/Faq.astro';
+import ToolCards from '../../components/ToolCards.astro';
+import { breadcrumbSchema, faqSchema, href, toolSchema, type FaqItem } from '../../site';
+
+const site = Astro.site!;
+const crumbs = [
+  { name: 'Accueil', path: '/' },
+  { name: 'QR code de paiement SEPA', path: '/qr-code-virement-sepa/' },
+];
+const faq: FaqItem[] = [
+  {
+    q: 'Toutes les applications bancaires lisent-elles ce QR code ?',
+    a: '<p>Non. Le QR code de paiement de l’EPC est très répandu en Allemagne, en Autriche, en Belgique ou aux Pays-Bas ; en France, sa prise en charge dépend de la banque. Gardez donc toujours l’IBAN et le montant écrits en clair à côté : le QR code est un raccourci, pas un remplaçant.</p>',
+  },
+  {
+    q: 'Le QR code contient-il des données sensibles ?',
+    a: '<p>Il contient exactement ce que l’on écrit déjà sur une facture : votre nom, votre IBAN, le montant et la référence. Rien de plus. Il est calculé dans votre navigateur ; aucune donnée n’est envoyée.</p>',
+  },
+  {
+    q: 'Peut-on laisser le montant vide ?',
+    a: '<p>Oui. Le payeur saisit alors le montant lui-même dans son application. C’est utile pour un QR code permanent (dons, acomptes libres), moins pour une facture.</p>',
+  },
+  {
+    q: 'Qu’est-ce qu’une référence RF ?',
+    a: '<p>Une référence de paiement normalisée (ISO 11649) : RF, deux chiffres de contrôle, puis votre référence. Elle permet à votre logiciel de rapprocher automatiquement le paiement. L’outil la calcule à partir de votre numéro de facture.</p>',
+  },
+];
+---
+<Base
+  title="Générateur de QR code de paiement SEPA (EPC) pour facture"
+  description="Créez le QR code de virement à imprimer sur vos factures : nom, IBAN, montant et référence, au format EPC. Téléchargement en PNG ou SVG, gratuit et sans inscription."
+  keywords={["qr code virement", "qr code paiement facture", "qr code sepa", "epc qr code", "qr code iban", "girocode", "qr code virement bancaire", "générateur qr code paiement", "qr code facture iban", "référence rf iso 11649", "paiement par qr code", "qr code sct"]}
+  schema={[toolSchema(site, { name: 'Générateur de QR code de paiement SEPA', path: '/qr-code-virement-sepa/', description: 'Crée un QR code de virement SEPA au format EPC069-12 pour les factures.' }), breadcrumbSchema(site, crumbs), faqSchema(faq)]}
+>
+  <Crumbs items={crumbs} />
+  <section class="hero wrap">
+    <h1>QR code de paiement pour vos factures</h1>
+    <p class="lead">Le client scanne le code avec l’application de sa banque : le bénéficiaire, l’IBAN, le montant et la référence se remplissent tout seuls. Moins d’erreurs de saisie, des paiements plus rapides.</p>
+  </section>
+  <div class="wrap">
+    <QrGenerator />
+
+    <article class="prose narrow section">
+      <h2>Un format européen, pas un QR code « maison »</h2>
+      <p>
+        Ce QR code suit les recommandations <strong>EPC069-12</strong> du Conseil européen des paiements, aussi connues sous le nom de GiroCode en Allemagne.
+        Le contenu est une suite de lignes normalisées : <code>BCD</code>, la version, le jeu de caractères, <code>SCT</code>, le BIC, le nom, l’IBAN, le montant,
+        puis la référence ou le libellé. Le tout ne doit pas dépasser 331 octets, avec un niveau de correction d’erreur M.
+      </p>
+      <h2>Bien l’imprimer</h2>
+      <ul>
+        <li>Au moins <strong>2 cm de côté</strong> sur papier, avec une marge blanche autour.</li>
+        <li>Une mention claire à côté, par exemple « Payer par virement : scannez avec votre application bancaire ».</li>
+        <li>Les mêmes informations en clair (IBAN, montant, référence), pour les payeurs dont l’application ne lit pas le code.</li>
+      </ul>
+      <p>Plus de détails dans le guide <a href={href('/guides/qr-code-paiement-sepa-facture/')}>le QR code de paiement sur les factures</a>.</p>
+    </article>
+    <Faq items={faq} />
+    <section class="section"><h2>Les autres outils</h2><ToolCards exclude="/qr-code-virement-sepa/" /></section>
+  </div>
+</Base>

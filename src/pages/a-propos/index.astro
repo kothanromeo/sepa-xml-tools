@@ -1,0 +1,47 @@
+---
+import Base from '../../layouts/Base.astro';
+import Crumbs from '../../components/Crumbs.astro';
+import { SITE, breadcrumbSchema } from '../../site';
+
+const crumbs = [
+  { name: 'Accueil', path: '/' },
+  { name: 'À propos', path: '/a-propos/' },
+];
+const person = {
+  '@context': 'https://schema.org',
+  '@type': 'Person',
+  name: SITE.author,
+  url: SITE.authorUrl,
+  sameAs: [SITE.linkedin, SITE.instagram, SITE.portfolio, SITE.authorUrl],
+  jobTitle: 'Développeur',
+};
+---
+<Base
+  keywords={["sepa xml tools", "roméo kothan", "générateur sepa open source", "fichier virement gratuit", "développeur"]}
+  title="À propos du projet"
+  description="SEPA XML Tools est un projet open source de Roméo Kothan : un générateur gratuit de fichiers de virements et de prélèvements SEPA, et de QR codes de paiement."
+  schema={[person, breadcrumbSchema(Astro.site!, crumbs)]}
+>
+  <Crumbs items={crumbs} />
+  <article class="wrap narrow prose" style="padding-top:1.5rem">
+    <h1>À propos</h1>
+    <p>
+      Je m’appelle {SITE.author}, je suis développeur. Beaucoup de petites structures saisissent encore leurs virements un par un,
+      ou paient un logiciel uniquement pour transformer un tableau en fichier XML. J’ai construit cet outil pour que ce soit gratuit,
+      immédiat, et sans confier ses IBAN à un service en ligne.
+    </p>
+    <h2>Les principes</h2>
+    <ul>
+      <li><strong>Tout se passe dans votre navigateur.</strong> Aucun tableau, IBAN ou montant n’est envoyé sur internet.</li>
+      <li><strong>Des fichiers conformes.</strong> Chaque version produite est testée contre les schémas XSD officiels de l’ISO 20022.</li>
+      <li><strong>Le code est public</strong>, sous licence MIT.</li>
+    </ul>
+    <h2>Sous le capot</h2>
+    <p>
+      Astro pour le site, TypeScript sans framework côté client. Les fichiers Excel sont lus et écrits directement au format Office Open XML,
+      avec fflate pour la compression. Le QR code est encodé par uqr, au niveau de correction exigé par la norme EPC.
+    </p>
+    <h2>Contribuer</h2>
+    <p>Une banque qui refuse un fichier, une option qui manque ? Ouvrez une <a href={`${SITE.repo}/issues`} rel="noopener">issue sur GitHub</a>, ou retrouvez-moi sur <a href={SITE.linkedin} rel="me noopener">LinkedIn</a>.</p>
+  </article>
+</Base>

@@ -1,0 +1,101 @@
+---
+interface Props {
+  kind: 'credit' | 'debit';
+}
+const { kind } = Astro.props;
+const credit = kind === 'credit';
+---
+<section class="gen" data-gen={kind} aria-label={credit ? 'Générateur de virements SEPA' : 'Générateur de prélèvements SEPA'}>
+  <fieldset>
+    <legend>{credit ? '1. Le compte à débiter (le vôtre)' : '1. Le compte à créditer (le vôtre)'}</legend>
+    <div class="fields">
+      <div class="wide-2">
+        <label for={`${kind}-name`}>{credit ? 'Nom du donneur d’ordre' : 'Nom du créancier'}</label>
+        <input id={`${kind}-name`} data-h="name" autocomplete="organization" placeholder="Raison sociale ou nom" />
+      </div>
+      <div class="wide-2">
+        <label for={`${kind}-iban`}>IBAN</label>
+        <input id={`${kind}-iban`} data-h="iban" class="mono-input" placeholder="FR76 …" spellcheck="false" />
+      </div>
+      <div>
+        <label for={`${kind}-bic`}>BIC <span class="hint">(facultatif)</span></label>
+        <input id={`${kind}-bic`} data-h="bic" class="mono-input" placeholder="ex. BNPAFRPP" spellcheck="false" />
+      </div>
+      {!credit && (
+        <div>
+          <label for="debit-ics">Identifiant créancier (ICS)</label>
+          <input id="debit-ics" data-h="ics" class="mono-input" placeholder="FR12ZZZ123456" spellcheck="false" />
+        </div>
+      )}
+      <div>
+        <label for={`${kind}-date`}>{credit ? 'Date d’exécution' : 'Date de prélèvement'}</label>
+        <input id={`${kind}-date`} type="date" data-h="date" />
+      </div>
+      <div>
+        <label for={`${kind}-version`}>Format</label>
+        <select id={`${kind}-version`} data-h="version">
+          {credit ? (
+            <>
+              <option value="pain.001.001.09">pain.001.001.09 (2019, recommandé)</option>
+              <option value="pain.001.001.03">pain.001.001.03 (2009)</option>
+            </>
+          ) : (
+            <>
+              <option value="pain.008.001.08">pain.008.001.08 (2019, recommandé)</option>
+              <option value="pain.008.001.02">pain.008.001.02 (2009)</option>
+            </>
+          )}
+        </select>
+      </div>
+      {!credit && (
+        <div>
+          <label for="debit-scheme">Type de prélèvement</label>
+          <select id="debit-scheme" data-h="scheme">
+            <option value="CORE">SEPA classique (CORE)</option>
+            <option value="B2B">Interentreprises (B2B)</option>
+          </select>
+        </div>
+      )}
+    </div>
+    <div class="opts">
+      {credit && <label class="choice"><input type="checkbox" data-h="instant" /> Virements instantanés (SCT Inst)</label>}
+      <label class="choice"><input type="checkbox" data-h="batch" /> Une seule ligne sur le relevé (débit ou crédit global)</label>
+    </div>
+    <details class="addr">
+      <summary>Adresse <span class="hint">(facultative ; demandée pour {credit ? 'les virements vers la Suisse, le Royaume-Uni, Monaco…' : 'les débiteurs hors Espace économique européen'})</span></summary>
+      <div class="fields" style="margin-top:0.6rem">
+        <div class="wide-2"><label for={`${kind}-street`}>Numéro et rue</label><input id={`${kind}-street`} data-h="street" autocomplete="address-line1" /></div>
+        <div><label for={`${kind}-postcode`}>Code postal</label><input id={`${kind}-postcode`} data-h="postcode" autocomplete="postal-code" /></div>
+        <div><label for={`${kind}-city`}>Ville</label><input id={`${kind}-city`} data-h="city" autocomplete="address-level2" /></div>
+        <div><label for={`${kind}-country`}>Pays (code)</label><input id={`${kind}-country`} data-h="country" value="FR" maxlength="2" /></div>
+      </div>
+    </details>
+    <div class="h-issues" data-hissues aria-live="polite"></div>
+  </fieldset>
+
+  <fieldset>
+    <legend>{credit ? '2. Les virements' : '2. Les prélèvements'}</legend>
+    <div class="drop" data-drop>
+      <p class="big">Importez votre tableau Excel ou CSV</p>
+      <p>Une ligne par {credit ? 'virement' : 'prélèvement'}, avec une ligne d’en-tête. Glissez-déposez le fichier ici, ou</p>
+      <div class="btn-row" style="justify-content:center">
+        <label class="btn" style="margin:0;color:var(--accent-ink)">
+          Choisir un fichier
+          <input type="file" accept=".xlsx,.csv,.txt,.tsv,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,text/csv" data-file />
+        </label>
+        <button type="button" class="btn secondary" data-manual>Saisir à la main</button>
+        <button type="button" class="btn ghost" data-sample>Essayer avec un exemple</button>
+      </div>
+      <p class="privacy">🔒 Tout se passe dans votre navigateur : ni vos IBAN ni vos montants ne sont envoyés sur internet. <button type="button" class="linklike" data-model>Télécharger le modèle Excel</button></p>
+    </div>
+    <div data-lines aria-live="polite"></div>
+  </fieldset>
+
+  <div class="summary-box" data-summary hidden></div>
+  <div class="result" data-result hidden aria-live="polite"></div>
+</section>
+
+<script>
+  import { mountGenerator } from '../scripts/gen-ui';
+  document.querySelectorAll<HTMLElement>('[data-gen]').forEach(mountGenerator);
+</script>

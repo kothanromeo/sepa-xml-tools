@@ -1,0 +1,93 @@
+---
+import { getCollection, render } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+import Crumbs from '../../components/Crumbs.astro';
+import Faq from '../../components/Faq.astro';
+import { SITE, breadcrumbSchema, faqSchema, href } from '../../site';
+import { ICONS } from '../../icons';
+
+export async function getStaticPaths() {
+  const posts = await getCollection('guides');
+  return posts.map((post) => ({ params: { slug: post.id }, props: { post } }));
+}
+
+const { post } = Astro.props;
+const { Content, headings } = await render(post);
+const site = Astro.site!;
+const path = `/guides/${post.id}/`;
+const crumbs = [
+  { name: 'Accueil', path: '/' },
+  { name: 'Guides', path: '/guides/' },
+  { name: post.data.title, path },
+];
+const toc = headings.filter((h) => h.depth === 2);
+const others = (await getCollection('guides')).filter((p) => p.id !== post.id);
+const fmt = (d: Date) => d.toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' });
+const updated = post.data.updated ?? post.data.published;
+
+const article = {
+  '@context': 'https://schema.org',
+  '@type': 'Article',
+  headline: post.data.title,
+  description: post.data.description,
+  inLanguage: 'fr-FR',
+  datePublished: post.data.published.toISOString(),
+  dateModified: updated.toISOString(),
+  author: { '@type': 'Person', name: SITE.author, url: SITE.linkedin || SITE.authorUrl },
+  publisher: { '@type': 'Person', name: SITE.author },
+  mainEntityOfPage: new URL(href(path), site).toString(),
+  image: new URL(href('/og.png'), site).toString(),
+};
+const schema: object[] = [article, breadcrumbSchema(site, crumbs)];
+if (post.data.faq.length) schema.push(faqSchema(post.data.faq));
+---
+<Base
+  title={post.data.seoTitle ?? post.data.title}
+  description={post.data.description}
+  ogType="article"
+  keywords={post.data.keywords}
+  published={post.data.published.toISOString()}
+  modified={updated.toISOString()}
+  schema={schema}
+>
+  <Crumbs items={crumbs} />
+  <article class="wrap narrow prose" style="padding-top:1.5rem">
+    <h1>{post.data.title}</h1>
+    <p class="meta">
+      Par <a href={SITE.linkedin || SITE.authorUrl} rel="author noopener">{SITE.author}</a> ·
+      publié le <time datetime={post.data.published.toISOString()}>{fmt(post.data.published)}</time>
+      {post.data.updated && <> · mis à jour le <time datetime={post.data.updated.toISOString()}>{fmt(post.data.updated)}</time></>}
+    </p>
+    {toc.length > 2 && (
+      <nav class="toc" aria-label="Sommaire">
+        <strong>Au sommaire</strong>
+        <ul>{toc.map((h) => <li><a href={`#${h.slug}`}>{h.text}</a></li>)}</ul>
+      </nav>
+    )}
+    <Content />
+    <div class="cta">
+      <p><strong>Des virements ou des prélèvements à préparer ?</strong> Importez votre tableau Excel : le fichier XML est contrôlé et généré dans votre navigateur.</p>
+      <div class="btn-row">
+        <a class="btn" href={href('/')}>Créer des virements</a>
+        <a class="btn secondary" href={href('/prelevement-sepa-xml/')}>Créer des prélèvements</a>
+      </div>
+    </div>
+    <section class="author-box" aria-label="L’auteur">
+      <span class="avatar" aria-hidden="true">RK</span>
+      <div>
+        <p><strong>{SITE.author}</strong>, développeur. J’écris ces guides et je construis des outils gratuits pour la comptabilité et la trésorerie des entreprises.
+        Je partage les prochains sur LinkedIn.</p>
+        <a class="btn-linkedin small" href={SITE.linkedin} rel="author noopener" target="_blank"><Fragment set:html={ICONS.linkedin} />Suivre {SITE.author.split(' ')[0]} sur LinkedIn</a>
+      </div>
+    </section>
+    {post.data.faq.length > 0 && <Faq items={post.data.faq} />}
+    <section class="section">
+      <h2>À lire aussi</h2>
+      <ul class="post-list">
+        {others.map((p) => (
+          <li><a href={href(`/guides/${p.id}/`)}><h3>{p.data.title}</h3><p>{p.data.description}</p></a></li>
+        ))}
+      </ul>
+    </section>
+  </article>
+</Base>

@@ -1,0 +1,14 @@
+---
+import { href } from '../site';
+interface Props {
+  items: { name: string; path: string }[];
+}
+const { items } = Astro.props;
+---
+<nav class="crumbs wrap" aria-label="Fil d’Ariane">
+  <ol>
+    {items.map((c, i) => (
+      <li>{i < items.length - 1 ? <a href={href(c.path)}>{c.name}</a> : <span aria-current="page">{c.name}</span>}</li>
+    ))}
+  </ol>
+</nav>

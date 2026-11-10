@@ -1,0 +1,24 @@
+---
+import { href } from '../site';
+interface Props {
+  exclude?: string;
+}
+const { exclude } = Astro.props;
+const tools = [
+  { path: '/', title: 'Virements SEPA', text: 'Le fichier XML de virements groupés (pain.001) à partir d’un tableau Excel : fournisseurs, salaires, remboursements.' },
+  { path: '/prelevement-sepa-xml/', title: 'Prélèvements SEPA', text: 'Le fichier de prélèvements (pain.008) avec ICS, RUM et séquences : cotisations, abonnements, loyers.' },
+  { path: '/qr-code-virement-sepa/', title: 'QR code de paiement', text: 'Le QR code à imprimer sur vos factures : le client scanne et le virement se remplit tout seul.' },
+  { path: '/lire-fichier-sepa-xml/', title: 'Lire un fichier SEPA', text: 'Ouvrir un fichier pain.001 ou pain.008 existant, contrôler ses totaux et l’exporter vers Excel.' },
+].filter((t) => t.path !== exclude);
+---
+<div class="grid-3 grid-tools">
+  {tools.map((t) => (
+    <a class="card tool-card" href={href(t.path)}>
+      <h3>{t.title}</h3>
+      <p>{t.text}</p>
+    </a>
+  ))}
+</div>
+<style>
+  .grid-tools { grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); }
+</style>

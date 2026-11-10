@@ -1,0 +1,55 @@
+---
+import Base from '../../layouts/Base.astro';
+import Reader from '../../components/Reader.astro';
+import Crumbs from '../../components/Crumbs.astro';
+import Faq from '../../components/Faq.astro';
+import ToolCards from '../../components/ToolCards.astro';
+import { breadcrumbSchema, faqSchema, href, toolSchema, type FaqItem } from '../../site';
+
+const site = Astro.site!;
+const crumbs = [
+  { name: 'Accueil', path: '/' },
+  { name: 'Lire un fichier SEPA XML', path: '/lire-fichier-sepa-xml/' },
+];
+const faq: FaqItem[] = [
+  {
+    q: 'Comment ouvrir un fichier SEPA XML ?',
+    a: '<p>Un navigateur ou un éditeur de texte l’affiche, mais sous forme de balises difficiles à lire. Déposez-le ici : chaque virement ou prélèvement apparaît sur une ligne, avec les totaux, et vous pouvez tout exporter vers Excel.</p>',
+  },
+  {
+    q: 'Ma banque a rejeté mon fichier : comment trouver l’erreur ?',
+    a: '<p>Les causes les plus fréquentes sont un nombre d’opérations ou un total d’en-tête faux, un IBAN invalide, un caractère interdit (accent, &amp;) ou une date passée. Le lecteur vérifie tous ces points. Le guide sur les rejets détaille les autres.</p>',
+  },
+  {
+    q: 'Quels formats sont reconnus ?',
+    a: '<p>Les remises de virements pain.001 et de prélèvements pain.008, quelle que soit la version (2009 ou 2019). Les relevés de compte camt.053 ne sont pas des remises : ils se lisent avec un convertisseur de relevés.</p>',
+  },
+];
+---
+<Base
+  title="Lire et vérifier un fichier SEPA XML (pain.001, pain.008)"
+  description="Ouvrez un fichier de virements ou de prélèvements SEPA XML : opérations, totaux et contrôles d’IBAN affichés en clair, export Excel. Pour comprendre un rejet."
+  keywords={["lire fichier sepa xml", "ouvrir fichier xml sepa", "fichier pain.001 lecture", "pain.008 lecture", "convertir xml sepa en excel", "vérifier fichier virement xml", "fichier sepa rejeté", "visualiser virement xml", "contrôle remise sepa", "xml sepa excel"]}
+  schema={[toolSchema(site, { name: 'Lecteur de fichiers SEPA XML', path: '/lire-fichier-sepa-xml/', description: 'Affiche et contrôle un fichier de virements (pain.001) ou de prélèvements (pain.008).' }), breadcrumbSchema(site, crumbs), faqSchema(faq)]}
+>
+  <Crumbs items={crumbs} />
+  <section class="hero wrap">
+    <h1>Lire un fichier SEPA XML</h1>
+    <p class="lead">Un fichier de virements ou de prélèvements à vérifier avant l’envoi, ou un rejet à comprendre ? Déposez-le : les opérations, les totaux et les anomalies s’affichent en clair.</p>
+  </section>
+  <div class="wrap">
+    <Reader />
+    <article class="prose narrow section">
+      <h2>Ce que le lecteur contrôle</h2>
+      <ul>
+        <li>Le <strong>nombre d’opérations</strong> et le <strong>total</strong> annoncés dans l’en-tête et dans chaque lot, comparés au contenu réel.</li>
+        <li>Les <strong>IBAN</strong> (clé, longueur, clé RIB) et la cohérence des <strong>BIC</strong>.</li>
+        <li>Pour les prélèvements : l’<strong>ICS</strong>, la séquence, la RUM et la date de chaque mandat.</li>
+        <li>Les <strong>caractères</strong> hors du jeu SEPA, les noms trop longs, les références en double.</li>
+      </ul>
+      <p>Pour les causes de rejet et la différence entre les versions, voir <a href={href('/guides/pain-001-version-rejets-fichier-sepa/')}>pain.001.001.03 ou .09 : versions et rejets</a>.</p>
+    </article>
+    <Faq items={faq} />
+    <section class="section"><h2>Les autres outils</h2><ToolCards exclude="/lire-fichier-sepa-xml/" /></section>
+  </div>
+</Base>

@@ -1,0 +1,22 @@
+---
+---
+<section data-reader aria-label="Lecteur de fichier SEPA XML">
+  <div class="drop" data-drop>
+    <p class="big">Déposez un fichier de virements ou de prélèvements SEPA (.xml)</p>
+    <p>Formats pain.001 (virements) et pain.008 (prélèvements), toutes versions. Glissez-déposez le fichier ici, ou</p>
+    <div class="btn-row" style="justify-content:center">
+      <label class="btn" style="margin:0;color:var(--accent-ink)">
+        Choisir un fichier
+        <input type="file" accept=".xml,text/xml,application/xml" data-file />
+      </label>
+      <button type="button" class="btn secondary" data-sample>Essayer avec un exemple</button>
+    </div>
+    <p class="privacy">🔒 Le fichier est lu dans votre navigateur. Rien n’est envoyé.</p>
+  </div>
+  <div class="result" data-result hidden aria-live="polite"></div>
+</section>
+
+<script>
+  import { mountReader } from '../scripts/reader-ui';
+  document.querySelectorAll<HTMLElement>('[data-reader]').forEach(mountReader);
+</script>

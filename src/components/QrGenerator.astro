@@ -1,0 +1,36 @@
+---
+---
+<section class="qr-tool" data-qr aria-label="Générateur de QR code de paiement SEPA">
+  <div class="qr-grid">
+    <form class="card" data-qr-form onsubmit="return false">
+      <div class="fields">
+        <div class="wide"><label for="qr-name">Nom du bénéficiaire</label><input id="qr-name" name="name" maxlength="70" autocomplete="organization" placeholder="Votre nom ou raison sociale" /></div>
+        <div class="wide"><label for="qr-iban">IBAN</label><input id="qr-iban" name="iban" class="mono-input" placeholder="FR76 …" spellcheck="false" /></div>
+        <div><label for="qr-bic">BIC <span class="hint">(facultatif)</span></label><input id="qr-bic" name="bic" class="mono-input" spellcheck="false" /></div>
+        <div><label for="qr-amount">Montant en euros <span class="hint">(facultatif)</span></label><input id="qr-amount" name="amount" inputmode="decimal" placeholder="ex. 149,90" /></div>
+        <div class="wide">
+          <label>Ce que le payeur verra comme motif</label>
+          <div class="opts" style="margin:0.2rem 0 0.4rem">
+            <label class="choice"><input type="radio" name="mode" value="text" checked /> Libellé libre</label>
+            <label class="choice"><input type="radio" name="mode" value="ref" /> Référence structurée (RF)</label>
+          </div>
+          <input name="text" maxlength="140" placeholder="ex. Facture F-2026-118" data-mode="text" />
+          <div data-mode="ref" hidden>
+            <input name="reference" class="mono-input" placeholder="ex. RF18 5390 0754 7034" />
+            <p class="hint">Pas encore de référence RF ? <button type="button" class="linklike" data-rf>La créer à partir du numéro de facture</button></p>
+          </div>
+        </div>
+        <div class="wide"><label for="qr-info">Information pour le payeur <span class="hint">(facultatif, 70 caractères)</span></label><input id="qr-info" name="info" maxlength="70" /></div>
+      </div>
+      <p class="privacy">🔒 Le QR code est calculé dans votre navigateur. Votre IBAN n’est envoyé nulle part.</p>
+    </form>
+    <div class="card qr-out" data-qr-out aria-live="polite">
+      <p class="hint">Renseignez au moins le nom et l’IBAN : le QR code apparaît ici.</p>
+    </div>
+  </div>
+</section>
+
+<script>
+  import { mountQr } from '../scripts/qr-ui';
+  document.querySelectorAll<HTMLElement>('[data-qr]').forEach(mountQr);
+</script>

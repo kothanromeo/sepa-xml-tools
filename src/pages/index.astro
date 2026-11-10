@@ -1,0 +1,97 @@
+---
+import { getCollection } from 'astro:content';
+import Base from '../layouts/Base.astro';
+import Generator from '../components/Generator.astro';
+import ToolCards from '../components/ToolCards.astro';
+import Faq from '../components/Faq.astro';
+import { faqSchema, href, toolSchema, type FaqItem } from '../site';
+
+const site = Astro.site!;
+const posts = (await getCollection('guides')).sort((a, b) => +b.data.published - +a.data.published);
+
+const faq: FaqItem[] = [
+  {
+    q: 'Ma banque acceptera-t-elle ce fichier ?',
+    a: '<p>Le fichier suit la norme ISO 20022 telle que la décrivent les guides du CFONB pour les banques françaises : pain.001.001.09 (version 2019) par défaut, ou pain.001.001.03 (version 2009) si votre banque ou votre logiciel ne lit que l’ancienne. Il faut en revanche que votre contrat de banque en ligne permette l’import de fichiers de virements ; c’est parfois une option à demander.</p>',
+  },
+  {
+    q: 'Mes IBAN et mes montants sont-ils envoyés quelque part ?',
+    a: '<p>Non. Le tableau est lu, contrôlé et transformé en XML par votre navigateur. Aucune donnée ne part sur internet, et rien n’est conservé une fois la page fermée.</p>',
+  },
+  {
+    q: 'Le BIC est-il obligatoire ?',
+    a: '<p>Non, pour les virements dans l’Espace économique européen l’IBAN suffit. Il reste demandé par la plupart des banques pour la Suisse, le Royaume-Uni, Monaco et les autres pays SEPA hors EEE ; dans ce cas, votre adresse doit aussi figurer dans le fichier.</p>',
+  },
+  {
+    q: 'Pourquoi mes accents ont-ils disparu ?',
+    a: '<p>Les banques françaises n’acceptent, sauf accord particulier, que les lettres sans accent, les chiffres, l’espace et quelques signes (/ - ? : ( ) . , \' +). L’outil convertit donc « Lefèvre & Fils » en « Lefevre et Fils » plutôt que de risquer un rejet du fichier entier.</p>',
+  },
+  {
+    q: 'Que veut dire « une seule ligne sur le relevé » ?',
+    a: '<p>C’est l’option « batch booking » : la banque débite le total en une fois au lieu d’une ligne par virement. Pratique pour la paie, qui n’apparaît alors pas nominativement sur le relevé. Toutes les banques ne la proposent pas ; à défaut, elles débitent chaque virement séparément.</p>',
+  },
+];
+---
+<Base
+  title="Créer un fichier de virements SEPA XML depuis Excel (gratuit)"
+  description="Générez le fichier XML de vos virements groupés (pain.001) à partir d’un tableau Excel : IBAN contrôlés, accents corrigés, prêt à importer dans votre banque."
+  keywords={["fichier virement sepa xml", "créer fichier virement groupé", "virement groupé excel", "excel vers xml sepa", "générateur virement sepa", "pain.001", "pain.001.001.09", "pain.001.001.03", "fichier xml virement banque", "virements fournisseurs fichier", "virement salaires fichier sepa", "virement instantané fichier", "remise de virements"]}
+  schema={[toolSchema(site, { name: 'Générateur de fichiers de virements SEPA', path: '/', description: 'Crée un fichier XML de virements SEPA (pain.001) à partir d’un tableau Excel ou CSV.' }), faqSchema(faq)]}
+>
+  <section class="hero wrap">
+    <h1>Créer un fichier de virements SEPA à partir d’Excel</h1>
+    <p class="lead">
+      Vos fournisseurs, vos salaires ou vos remboursements sont dans un tableau ? Importez-le : chaque IBAN est contrôlé,
+      les caractères refusés par les banques sont corrigés, et vous obtenez le fichier XML à déposer dans votre banque en ligne.
+    </p>
+    <ul class="badges">
+      <li>pain.001.001.09 et .03</li>
+      <li>Virement instantané</li>
+      <li>Excel et CSV</li>
+      <li>100 % navigateur</li>
+    </ul>
+  </section>
+
+  <div class="wrap">
+    <Generator kind="credit" />
+
+    <section class="section">
+      <h2>Les autres outils</h2>
+      <ToolCards exclude="/" />
+    </section>
+
+    <section class="section two-col">
+      <div>
+        <h2>Comment ça marche</h2>
+        <ol>
+          <li><strong>Votre compte</strong> : le nom et l’IBAN du compte à débiter, et la date d’exécution souhaitée.</li>
+          <li><strong>Vos virements</strong> : importez un fichier Excel ou CSV (une ligne par virement), ou saisissez-les directement. Les colonnes sont reconnues automatiquement.</li>
+          <li><strong>Les contrôles</strong> : IBAN (clé, longueur, clé RIB), BIC, montants, longueur des libellés, références en double. Un RIB saisi à la place d’un IBAN est converti.</li>
+          <li><strong>Le fichier</strong> : un clic, et le XML est prêt à importer dans l’espace « virements groupés » ou « remise de fichiers » de votre banque.</li>
+        </ol>
+        <p>Pas de tableau sous la main ? Le lien « Télécharger le modèle Excel », dans l’étape 2, fournit un modèle prêt à remplir.</p>
+      </div>
+      <div>
+        <h2>Ce que le fichier respecte</h2>
+        <ul>
+          <li>La norme <strong>ISO 20022</strong> en version 2019 (<code>pain.001.001.09</code>) ou 2009 (<code>pain.001.001.03</code>), validée contre les schémas officiels.</li>
+          <li>Le <strong>jeu de caractères</strong> des banques françaises (guide CFONB).</li>
+          <li>Les <strong>adresses structurées</strong> (ville et pays dans des champs séparés), seules admises pour les paiements SEPA après le 15 novembre 2026.</li>
+          <li>Les règles de l’EPC : nom limité à 70 caractères, libellé à 140, référence à 35, BIC facultatif dans l’EEE.</li>
+        </ul>
+        <p>Les détails sont dans le guide <a href={href('/guides/fichier-virement-groupe-sepa-xml-excel/')}>du tableau Excel au fichier XML</a>.</p>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2>Les guides</h2>
+      <ul class="post-list">
+        {posts.map((p) => (
+          <li class="card"><a href={href(`/guides/${p.id}/`)}><h3>{p.data.title}</h3><p>{p.data.description}</p></a></li>
+        ))}
+      </ul>
+    </section>
+
+    <Faq items={faq} />
+  </div>
+</Base>

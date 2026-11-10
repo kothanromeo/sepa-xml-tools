@@ -1,0 +1,35 @@
+---
+import { SITE } from '../site';
+import { ICONS } from '../icons';
+---
+<aside class="creator-band" aria-label="À propos du créateur">
+  <div class="wrap creator-inner">
+    <div class="creator-id">
+      <span class="avatar" aria-hidden="true">RK</span>
+      <div>
+        <p class="creator-title">Outil créé gratuitement par <strong>{SITE.author}</strong>, développeur</p>
+        <p class="creator-sub">
+          Pas de pub, pas de compte, pas de collecte de données. Si cet outil vous a fait gagner du temps,
+          le meilleur merci est de me suivre sur LinkedIn : j’y partage les prochains outils et les coulisses de leur fabrication.
+        </p>
+      </div>
+    </div>
+    <div class="creator-links">
+      <a class="btn-linkedin" href={SITE.linkedin} rel="me noopener" target="_blank">
+        <Fragment set:html={ICONS.linkedin} />
+        Suivre sur LinkedIn
+      </a>
+      <div class="creator-secondary">
+        <a href={SITE.instagram} rel="me noopener" target="_blank" aria-label={`Instagram ${SITE.instagramHandle}`}>
+          <Fragment set:html={ICONS.instagram} /><span>Instagram</span>
+        </a>
+        <a href={SITE.portfolio} rel="me noopener" target="_blank" aria-label="Portfolio">
+          <Fragment set:html={ICONS.globe} /><span>Portfolio</span>
+        </a>
+        <a href={SITE.authorUrl} rel="me noopener" target="_blank" aria-label="GitHub">
+          <Fragment set:html={ICONS.github} /><span>GitHub</span>
+        </a>
+      </div>
+    </div>
+  </div>
+</aside>

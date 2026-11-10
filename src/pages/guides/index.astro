@@ -1,0 +1,41 @@
+---
+import { getCollection } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+import Crumbs from '../../components/Crumbs.astro';
+import { breadcrumbSchema, href } from '../../site';
+
+const posts = (await getCollection('guides')).sort((a, b) => +b.data.published - +a.data.published);
+const crumbs = [
+  { name: 'Accueil', path: '/' },
+  { name: 'Guides', path: '/guides/' },
+];
+const fmt = (d: Date) => d.toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' });
+---
+<Base
+  keywords={["virement sepa xml", "fichier virement groupé", "prélèvement sepa", "ics rum mandat", "qr code paiement facture", "pain.001", "pain.008", "guide sepa"]}
+  title="Guides : virements, prélèvements et QR codes SEPA"
+  description="Virements groupés depuis Excel, prélèvements SEPA (ICS, RUM, mandat), QR code de paiement, versions pain.001 et rejets : des guides concrets, exemples à l’appui."
+  schema={[breadcrumbSchema(Astro.site!, crumbs)]}
+>
+  <Crumbs items={crumbs} />
+  <section class="hero wrap narrow">
+    <h1>Guides virements et prélèvements SEPA</h1>
+    <p class="lead">
+      Des explications concrètes sur le format et sur la réforme, écrites par un développeur qui a passé du temps dans les spécifications
+      pour que vous n’ayez pas à le faire.
+    </p>
+  </section>
+  <div class="wrap narrow">
+    <ul class="post-list">
+      {posts.map((p) => (
+        <li class="card">
+          <a href={href(`/guides/${p.id}/`)}>
+            <h2>{p.data.title}</h2>
+            <p>{p.data.description}</p>
+            <time datetime={p.data.published.toISOString()}>{fmt(p.data.published)}</time>
+          </a>
+        </li>
+      ))}
+    </ul>
+  </div>
+</Base>

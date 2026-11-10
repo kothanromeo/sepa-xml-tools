@@ -1,0 +1,83 @@
+---
+import Base from '../../layouts/Base.astro';
+import Generator from '../../components/Generator.astro';
+import Crumbs from '../../components/Crumbs.astro';
+import Faq from '../../components/Faq.astro';
+import ToolCards from '../../components/ToolCards.astro';
+import { breadcrumbSchema, faqSchema, href, toolSchema, type FaqItem } from '../../site';
+
+const site = Astro.site!;
+const crumbs = [
+  { name: 'Accueil', path: '/' },
+  { name: 'Créer un fichier de prélèvements SEPA', path: '/prelevement-sepa-xml/' },
+];
+const faq: FaqItem[] = [
+  {
+    q: 'Où trouver mon identifiant créancier SEPA (ICS) ?',
+    a: '<p>Il est attribué par votre banque, sur demande, avant votre premier prélèvement. En France, il fait 13 caractères et commence par FR (par exemple FR07ZZZ591778). L’outil vérifie sa clé de contrôle.</p>',
+  },
+  {
+    q: 'Faut-il encore indiquer FRST pour un premier prélèvement ?',
+    a: '<p>Ce n’est plus obligatoire : depuis novembre 2016, le premier prélèvement d’un mandat récurrent peut être envoyé en RCUR. FRST reste accepté. Utilisez OOFF pour un prélèvement ponctuel et FNAL pour le dernier d’une série.</p>',
+  },
+  {
+    q: 'Combien de temps avant l’échéance faut-il déposer le fichier ?',
+    a: '<p>Entre banques, le délai minimal est d’un jour ouvré avant l’échéance, quel que soit le type de séquence. Votre banque fixe sa propre heure limite, souvent la veille ouvrée avant midi, parfois plusieurs jours avant : vérifiez votre contrat. Le client doit aussi avoir été prévenu du montant et de la date, en principe 14 jours avant.</p>',
+  },
+  {
+    q: 'Puis-je prélever sans mandat signé ?',
+    a: '<p>Non. Chaque prélèvement s’appuie sur un mandat signé par le débiteur, identifié par sa référence unique (RUM) et sa date de signature, que vous devez conserver. Un prélèvement sans mandat peut être contesté pendant 13 mois.</p>',
+  },
+];
+---
+<Base
+  title="Créer un fichier de prélèvements SEPA XML depuis Excel (pain.008)"
+  description="Générez votre fichier de prélèvements SEPA (pain.008) depuis Excel : ICS, RUM, date de mandat et séquences contrôlés, prêt à remettre à votre banque. Gratuit."
+  keywords={["fichier prélèvement sepa xml", "créer fichier prélèvement sepa", "prélèvement sepa excel", "pain.008", "pain.008.001.08", "pain.008.001.02", "prélèvement sepa association", "prélèvement cotisations", "ics rum mandat", "remise prélèvements banque", "prélèvement sepa core b2b", "générateur prélèvement sepa"]}
+  schema={[toolSchema(site, { name: 'Générateur de fichiers de prélèvements SEPA', path: '/prelevement-sepa-xml/', description: 'Crée un fichier XML de prélèvements SEPA (pain.008) à partir d’un tableau Excel ou CSV.' }), breadcrumbSchema(site, crumbs), faqSchema(faq)]}
+>
+  <Crumbs items={crumbs} />
+  <section class="hero wrap">
+    <h1>Créer un fichier de prélèvements SEPA</h1>
+    <p class="lead">
+      Cotisations d’une association, abonnements, loyers : importez la liste de vos débiteurs et leurs mandats,
+      l’outil contrôle l’ICS, les IBAN et les RUM, regroupe les prélèvements par séquence et produit le fichier pain.008 pour votre banque.
+    </p>
+    <ul class="badges">
+      <li>pain.008.001.08 et .02</li>
+      <li>CORE et B2B</li>
+      <li>FRST, RCUR, OOFF, FNAL</li>
+      <li>100 % navigateur</li>
+    </ul>
+  </section>
+  <div class="wrap">
+    <Generator kind="debit" />
+
+    <article class="prose narrow section">
+      <h2>Ce qu’il faut avant de commencer</h2>
+      <ul>
+        <li><strong>Un identifiant créancier SEPA (ICS)</strong>, demandé à votre banque. Il vous suit même si vous changez de banque.</li>
+        <li><strong>Un mandat signé par chaque débiteur</strong>, avec sa référence unique (RUM, 35 caractères au plus) et sa date de signature.</li>
+        <li><strong>Le service de remise de prélèvements</strong> activé sur votre compte : c’est un contrat à part chez la plupart des banques.</li>
+      </ul>
+      <h2>Les séquences, simplement</h2>
+      <p>
+        Chaque prélèvement indique sa place dans la vie du mandat : <code>FRST</code> pour le premier, <code>RCUR</code> pour les suivants,
+        <code>FNAL</code> pour le dernier et <code>OOFF</code> pour un prélèvement unique. Comme la norme exige une seule séquence par lot,
+        l’outil crée automatiquement un lot par séquence présente dans votre tableau. Sans précision, une ligne est traitée en <code>RCUR</code>.
+      </p>
+      <p>
+        Tout est détaillé, avec le calcul de la clé de l’ICS, dans le guide
+        <a href={href('/guides/prelevement-sepa-ics-rum-mandat/')}>ICS, RUM, mandat et séquences</a>.
+      </p>
+      <h2>CORE ou B2B ?</h2>
+      <p>
+        Le prélèvement <strong>CORE</strong> est le cas général. Le débiteur peut en demander le remboursement à sa banque pendant 8 semaines sans justification.
+        Le prélèvement <strong>interentreprises (B2B)</strong> est réservé aux débiteurs professionnels ; il n’ouvre pas ce droit au remboursement,
+        mais le débiteur doit avoir enregistré le mandat auprès de sa propre banque, sinon le prélèvement est rejeté.
+      </p>
+    </article>
+    <Faq items={faq} />
+    <section class="section"><h2>Les autres outils</h2><ToolCards exclude="/prelevement-sepa-xml/" /></section>
+  </div>
+</Base>
