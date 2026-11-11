@@ -42,7 +42,9 @@ const websiteSchema = {
     {noindex && <meta name="robots" content="noindex" />}
     <meta name="author" content={SITE.author} />
     <meta name="theme-color" content="#0b5c8c" />
+    <link rel="icon" href={href('/favicon.ico')} sizes="48x48" />
     <link rel="icon" href={href('/favicon.svg')} type="image/svg+xml" />
+    <link rel="apple-touch-icon" href={href('/apple-touch-icon.png')} />
     <link rel="sitemap" href={href('/sitemap-index.xml')} />
     <link rel="alternate" type="application/rss+xml" title={`${SITE.name} — guides`} href={href('/rss.xml')} />
 
